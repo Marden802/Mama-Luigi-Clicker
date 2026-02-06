@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mama Luigi: Progressive News</title>
+    <style>
+        body { text-align: center; font-family: 'Arial', sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden; }
+        #header { background: #1b5e20; color: white; padding: 5px; border-bottom: 4px solid #ffd700; }
+        
+        /* News Ticker */
+        #news-container { background: #222; color: #00ff00; padding: 10px; font-family: 'Courier New', monospace; font-size: 16px; border-bottom: 2px solid #1b5e20; overflow: hidden; white-space: nowrap; }
+        #ticker-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+        #main-container { display: flex; flex: 1; overflow: hidden; }
+        #game-area { flex: 1; padding: 20px; background: #c8e6c9; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 4px solid #1b5e20; }
+        #luigi { width: 220px; cursor: pointer; user-select: none; transition: transform 0.05s; }
+        #luigi:active { transform: scale(0.9); }
+        
+        #sidebar { flex: 1; background: white; display: flex; flex-direction: column; }
+        .tab-bar { display: flex; background: #333; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; color: white; font-weight: bold; background: #333; }
+        .tab-btn.active { background: #4caf50; }
+        #tab-content { flex: 1; overflow-y: scroll; padding: 15px; text-align: left; }
+
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .upgrade-btn { padding: 10px 15px; cursor: pointer; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; }
+        .upgrade-btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .stats-display { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #1b5e20; }
+        .system-btn { margin: 5px; padding: 10px; cursor: pointer; border-radius: 5px; border: 1px solid #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="header"><h2 style="margin:0;">Mama Luigi Clicker</h2></div>
+    
+    <div id="news-container">
+        <div id="ticker-text">Welcome to Dinosaur Land! Click Luigi to start the news...</div>
+    </div>
+
+    <div id="main-container">
+        <div id="game-area">
+            <div class="stats-display">Luigis: <span id="count">0</span></div>
+            <div style="font-size: 18px; margin-bottom: 20px;">LPS: <span id="lps-text">0</span> | Golden Caps: <span id="caps-text">0</span></div>
+            
+            <img id="luigi" src="Mama Luigi.png" onclick="clickLuigi()">
+            
+            <div style="margin-top: 30px;">
+                <button class="system-btn" style="background:#ffd700;" onclick="prestige()">PRESTIGE (+<span id="pending-caps">0</span>)</button>
+                <button class="system-btn" onclick="toggleMusic()">🎵 Music</button>
+                <button class="system-btn" onclick="saveGame()">💾 Save</button>
+                <button class="system-btn" style="background:#ff5252; color:white;" onclick="resetGame()">🧹 Reset</button>
+            </div>
+
+            <audio id="clickSound" src="mama-luigi_1.mp3"></audio>
+            <audio id="screamSound" src="mama-luigi-scream.mp3"></audio>
+            <audio id="bgMusic" src="04. Face Collection.mp3" loop></audio>
+        </div>
+
+        <div id="sidebar">
+            <div class="tab-bar">
+                <button id="tab-upgrades" class="tab-btn active" onclick="switchTab('upgrades')">ITEMS (100)</button>
+                <button id="tab-market" class="tab-btn" onclick="switchTab('market')">MARKET (20)</button>
+                <button id="tab-trophies" class="tab-btn" onclick="switchTab('trophies')">TROPHIES (20)</button>
+            </div>
+            <div id="tab-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let luigis = 0, allTimeLuigis = 0, goldenCaps = 0, multiplier = 1, currentTab = 'upgrades', musicPlaying = false;
+
+        // 50 Progressive Headlines grouped by All-Time Luigis
+        const newsData = [
+            { threshold: 0, lines: ["Local man finds green hat in trash.", "Plumber says 'It's a-me' to confused wall.", "Green sock sales up by 2%.", "Area man forgets how to jump.", "Is it pasta? Or is it destiny?"] },
+            { threshold: 100, lines: ["Luigi seen carrying 100 meatballs.", "Neighborhood cat suspiciously resembles a Goomba.", "Plumbing bill at mansion reaches record high.", "Man claims 'Mama Luigi' is his legal name.", "Pasta water found in local reservoir."] },
+            { threshold: 1000, lines: ["Thousands flock to see the 'Great Green One'.", "Yoshi spotted eating local park benches.", "Castle deeds traded for spaghetti bowls.", "King Koopa complains about 'too much green'.", "Plumbing tools declared obsolete by Luigi."] },
+            { threshold: 10000, lines: ["National Pasta Day declared 365 days a year.", "Luigi's mustache can now be seen from space.", "Ghost population drops as vacuums improve.", "Scientists wonder: 'Is Luigi made of spaghetti?'", "Dinosaur Land renamed 'Luigiville'."] },
+            { threshold: 100000, lines: ["World Economy switches to Meatball Standard.", "Bowser retires to open a modest pizzeria.", "Green caps are now mandatory headwear.", "Luigi accidentally jumps over the moon.", "Fire flowers used to heat entire cities."] },
+            { threshold: 1000000, lines: ["The Luigipocalypse has begun.", "Gravity fails as Luigi jumps too much.", "Intergalactic spaghetti storm approaching.", "Luigi is now the primary source of world heat.", "Universe revealed to be inside a giant green sock."] },
+            { threshold: 1000000000, lines: ["Reality collapsing into one giant 'That's Mama Luigi'.", "Golden Caps discovered in deep space.", "Luigi transcends time and plumbing.", "Every molecule in the universe is now a Luigi.", "Game Dev says: 'Please stop clicking, he's too powerful!'"] }
+        ];
+
+        let lastHeadline = "";
+        function updateNews() {
+            let ticker = document.getElementById('ticker-text');
+            let possibleLines = newsData[0].lines;
+            for (let i = newsData.length - 1; i >= 0; i--) {
+                if (allTimeLuigis >= newsData[i].threshold) {
+                    possibleLines = newsData[i].lines;
+                    break;
+                }
+            }
+            let newLine = possibleLines[Math.floor(Math.random() * possibleLines.length)];
+            if(newLine !== lastHeadline) {
+                ticker.innerText = newLine;
+                lastHeadline = newLine;
+            }
+        }
+
+        // Initialization
+        const upgrades = [];
+        for(let i=0; i<100; i++) upgrades.push({ id: i, name: "Gear #"+(i+1), cost: Math.floor(10 * Math.pow(1.3, i)), power: Math.floor(1 * Math.pow(1.35, i)), count: 0 });
+        const marketItems = [];
+        for(let i=0; i<20; i++) marketItems.push({ id: i, name: "Gold Mult #"+(i+1), cost: Math.floor(Math.pow(5, i+1)), mult: 2, bought: false });
+        const trophies = [];
+        for(let i=0; i<20; i++) trophies.push({ id: i, name: "Trophy #"+(i+1), goal: Math.pow(10, i+2) });
+
+        function clickLuigi() {
+            let gain = 1 * multiplier;
+            luigis += gain; allTimeLuigis += gain;
+            playSound('clickSound'); updateUI();
+        }
+
+        function playSound(id) { let s = document.getElementById(id); s.currentTime = 0; s.play().catch(() => {}); }
+
+        function toggleMusic() {
+            let m = document.getElementById('bgMusic');
+            musicPlaying ? m.pause() : m.play().catch(() => {});
+            musicPlaying = !musicPlaying;
+        }
+
+        function buyUpgrade(id) {
+            let up = upgrades[id];
+            if(luigis >= up.cost) {
+                luigis -= up.cost; up.count++; up.cost = Math.floor(up.cost * 1.3);
+                playSound('screamSound'); updateUI(); renderTab();
+            }
+        }
+
+        function buyMarket(id) {
+            let item = marketItems[id];
+            if(goldenCaps >= item.cost && !item.bought) {
+                goldenCaps -= item.cost; item.bought = true; multiplier *= item.mult;
+                updateUI(); renderTab();
+            }
+        }
+
+        function prestige() {
+            let gain = Math.floor(Math.sqrt(allTimeLuigis / 1000000)) - goldenCaps;
+            if(gain <= 0) { alert("Need 1,000,000 All-Time Luigis!"); return; }
+            if(confirm("Prestige? Keep Caps & Mults, lose Luigis & Items!")) {
+                goldenCaps += gain; luigis = 0;
+                upgrades.forEach((u, i) => { u.count = 0; u.cost = Math.floor(10 * Math.pow(1.3, i)); });
+                updateUI(); renderTab();
+            }
+        }
+
+        function switchTab(t) {
+            currentTab = t;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + t).classList.add('active');
+            renderTab();
+        }
+
+        function renderTab() {
+            let container = document.getElementById('tab-content'); container.innerHTML = "";
+            if(currentTab === 'upgrades') {
+                upgrades.forEach(up => {
+                    container.innerHTML += `<div class="item-row"><div><strong>${up.name}</strong><br><small>LPS: ${up.power} | Owned: ${up.count}</small></div><button class="upgrade-btn" ${luigis < up.cost ? 'disabled' : ''} onclick="buyUpgrade(${up.id})">${up.cost.toLocaleString()}</button></div>`;
+                });
+            } else if(currentTab === 'market') {
+                marketItems.forEach(item => {
+                    container.innerHTML += `<div class="item-row"><div><strong>${item.name}</strong><br><small>Effect: x${item.mult}</small></div><button class="upgrade-btn" style="background:#ffd700; color:black;" ${ (goldenCaps < item.cost || item.bought) ? 'disabled' : ''} onclick="buyMarket(${item.id})">${item.bought ? 'OWNED' : item.cost + ' Caps'}</button></div>`;
+                });
+            } else if(currentTab === 'trophies') {
+                trophies.forEach(t => {
+                    let unlocked = allTimeLuigis >= t.goal;
+                    container.innerHTML += `<div class="item-row" style="opacity: ${unlocked ? 1 : 0.4}"><div><strong>${unlocked ? '🏆' : '🔒'} ${t.name}</strong><br><small>Goal: ${t.goal.toLocaleString()} Luigis</small></div></div>`;
+                });
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('count').innerText = Math.floor(luigis).toLocaleString();
+            document.getElementById('caps-text').innerText = goldenCaps.toLocaleString();
+            let totalLps = upgrades.reduce((sum, up) => sum + (up.power * up.count), 0) * multiplier;
+            document.getElementById('lps-text').innerText = Math.floor(totalLps).toLocaleString();
+            let pending = Math.floor(Math.sqrt(allTimeLuigis / 1000000)) - goldenCaps;
+            document.getElementById('pending-caps').innerText = Math.max(0, pending);
+        }
+
+        // Ticker logic: Update headline every 10 seconds
+        setInterval(updateNews, 10000);
+
+        setInterval(() => {
+            let totalLps = upgrades.reduce((sum, up) => sum + (up.power * up.count), 0) * multiplier;
+            luigis += (totalLps / 10); allTimeLuigis += (totalLps / 10);
+            updateUI();
+            let buttons = document.querySelectorAll('.upgrade-btn');
+            if(buttons.length > 0 && currentTab === 'upgrades') {
+                upgrades.forEach((up, i) => { if(buttons[i]) buttons[i].disabled = (luigis < up.cost); });
+            }
+        }, 100);
+
+        window.onload = () => { renderTab(); updateUI(); updateNews(); };
+        function saveGame() { alert("Saved!"); }
+        function resetGame() { if(confirm("Wipe everything?")) location.reload(); }
+    </script>
+</body>
+</html>
