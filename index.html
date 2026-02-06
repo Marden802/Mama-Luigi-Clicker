@@ -2,55 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mama Luigi: Progressive News</title>
+    <title>Mama Luigi Clicker: Ultimate</title>
     <style>
-        body { text-align: center; font-family: 'Arial', sans-serif; background-color: #e8f5e9; display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden; }
+        body { text-align: center; font-family: 'Arial', sans-serif; background: #e8f5e9; display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden; }
         #header { background: #1b5e20; color: white; padding: 5px; border-bottom: 4px solid #ffd700; }
         
-        /* News Ticker */
-        #news-container { background: #222; color: #00ff00; padding: 10px; font-family: 'Courier New', monospace; font-size: 16px; border-bottom: 2px solid #1b5e20; overflow: hidden; white-space: nowrap; }
-        #ticker-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        #news-container { background: #222; color: #0f0; padding: 10px; font-family: monospace; height: 20px; overflow: hidden; white-space: nowrap; border-bottom: 2px solid #1b5e20; }
+        #ticker-text { display: inline-block; animation: marquee 40s linear infinite; }
+        @keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
         #main-container { display: flex; flex: 1; overflow: hidden; }
-        #game-area { flex: 1; padding: 20px; background: #c8e6c9; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 4px solid #1b5e20; }
-        #luigi { width: 220px; cursor: pointer; user-select: none; transition: transform 0.05s; }
-        #luigi:active { transform: scale(0.9); }
+        #game-area { flex: 1; padding: 20px; background: #c8e6c9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-right: 4px solid #1b5e20; }
         
+        #luigi { width: 200px; cursor: pointer; user-select: none; transition: transform 0.05s; }
+        #luigi:active { transform: scale(0.95); }
+
+        #meter-container { width: 200px; height: 15px; background: #333; border-radius: 10px; margin: 5px; border: 2px solid #555; overflow: hidden; }
+        #meter-fill { width: 0%; height: 100%; background: #ffeb3b; }
+
+        #meatball { position: absolute; width: 70px; height: 70px; cursor: pointer; display: none; z-index: 100; filter: drop-shadow(0 0 10px gold) brightness(1.2); transition: transform 0.1s; }
+        #meatball:active { transform: scale(0.8); }
+
         #sidebar { flex: 1; background: white; display: flex; flex-direction: column; }
         .tab-bar { display: flex; background: #333; }
         .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; color: white; font-weight: bold; background: #333; }
         .tab-btn.active { background: #4caf50; }
-        #tab-content { flex: 1; overflow-y: scroll; padding: 15px; text-align: left; }
+        #tab-content { flex: 1; overflow-y: scroll; padding: 15px; }
 
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
-        .upgrade-btn { padding: 10px 15px; cursor: pointer; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; }
-        .upgrade-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 5px; }
+        .upgrade-btn { padding: 10px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; min-width: 80px; }
+        .upgrade-btn:disabled { background: #ccc !important; cursor: not-allowed; }
         
-        .stats-display { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #1b5e20; }
-        .system-btn { margin: 5px; padding: 10px; cursor: pointer; border-radius: 5px; border: 1px solid #333; font-weight: bold; }
+        .stats { font-size: 24px; font-weight: bold; color: #1b5e20; }
+        .sys-btn { margin: 5px; padding: 8px; cursor: pointer; font-weight: bold; border-radius: 5px; }
+
+        /* Notification Styling */
+        #save-popup { position: fixed; bottom: 20px; left: 20px; background: #333; color: white; padding: 10px; border-radius: 5px; display: none; z-index: 1000; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div id="header"><h2 style="margin:0;">Mama Luigi Clicker</h2></div>
-    
-    <div id="news-container">
-        <div id="ticker-text">Welcome to Dinosaur Land! Click Luigi to start the news...</div>
-    </div>
+    <div id="save-popup">💾 Game Auto-Saved!</div>
+    <div id="header"><h2 style="margin:0;">Mama Luigi Clicker: Ultimate</h2></div>
+    <div id="news-container"><div id="ticker-text">Welcome! Click Luigi to begin...</div></div>
 
     <div id="main-container">
         <div id="game-area">
-            <div class="stats-display">Luigis: <span id="count">0</span></div>
-            <div style="font-size: 18px; margin-bottom: 20px;">LPS: <span id="lps-text">0</span> | Golden Caps: <span id="caps-text">0</span></div>
+            <img id="meatball" src="meatball.png" onclick="clickMeatball()" alt="GOLDEN MEATBALL">
+            <div class="stats">Luigis: <span id="count">0</span></div>
+            <div style="font-weight:bold;">LPS: <span id="lps-text">0</span> | Caps: <span id="caps-text">0</span></div>
+            <div style="font-size:12px; margin-top:10px;">Spaghetti Buff: +<span id="stat-buff">0</span>%</div>
+            <div id="meter-container"><div id="meter-fill"></div></div>
             
             <img id="luigi" src="Mama Luigi.png" onclick="clickLuigi()">
             
-            <div style="margin-top: 30px;">
-                <button class="system-btn" style="background:#ffd700;" onclick="prestige()">PRESTIGE (+<span id="pending-caps">0</span>)</button>
-                <button class="system-btn" onclick="toggleMusic()">🎵 Music</button>
-                <button class="system-btn" onclick="saveGame()">💾 Save</button>
-                <button class="system-btn" style="background:#ff5252; color:white;" onclick="resetGame()">🧹 Reset</button>
+            <div style="margin-top:20px;">
+                <button class="sys-btn" style="background:#ffd700;" onclick="prestige()">PRESTIGE (+<span id="pending-caps">0</span>)</button>
+                <button class="sys-btn" id="m-btn" onclick="toggleMusic()">🎵 Play Music</button>
+                <button class="sys-btn" onclick="saveGame(true)">💾 Save</button>
+                <button class="sys-btn" style="background:#ff5252; color:white;" onclick="resetGame()">🧹 Reset</button>
             </div>
 
             <audio id="clickSound" src="mama-luigi_1.mp3"></audio>
@@ -60,143 +70,183 @@
 
         <div id="sidebar">
             <div class="tab-bar">
-                <button id="tab-upgrades" class="tab-btn active" onclick="switchTab('upgrades')">ITEMS (100)</button>
-                <button id="tab-market" class="tab-btn" onclick="switchTab('market')">MARKET (20)</button>
-                <button id="tab-trophies" class="tab-btn" onclick="switchTab('trophies')">TROPHIES (20)</button>
+                <button id="btn-up" class="tab-btn active" onclick="switchTab('upgrades')">ITEMS</button>
+                <button id="btn-mkt" class="tab-btn" onclick="switchTab('market')">MARKET</button>
+                <button id="btn-tro" class="tab-btn" onclick="switchTab('trophies')">TROPHIES</button>
             </div>
             <div id="tab-content"></div>
         </div>
     </div>
 
     <script>
-        let luigis = 0, allTimeLuigis = 0, goldenCaps = 0, multiplier = 1, currentTab = 'upgrades', musicPlaying = false;
+        let score = 0, allTime = 0, caps = 0, multi = 1, buff = 0, meter = 0;
+        let currentTab = 'upgrades', musicOn = false, frenzy = false;
+        let currentHeadline = "Welcome! Click Luigi to begin your pasta empire...";
+        let headlineTimer = 0;
 
-        // 50 Progressive Headlines grouped by All-Time Luigis
-        const newsData = [
-            { threshold: 0, lines: ["Local man finds green hat in trash.", "Plumber says 'It's a-me' to confused wall.", "Green sock sales up by 2%.", "Area man forgets how to jump.", "Is it pasta? Or is it destiny?"] },
-            { threshold: 100, lines: ["Luigi seen carrying 100 meatballs.", "Neighborhood cat suspiciously resembles a Goomba.", "Plumbing bill at mansion reaches record high.", "Man claims 'Mama Luigi' is his legal name.", "Pasta water found in local reservoir."] },
-            { threshold: 1000, lines: ["Thousands flock to see the 'Great Green One'.", "Yoshi spotted eating local park benches.", "Castle deeds traded for spaghetti bowls.", "King Koopa complains about 'too much green'.", "Plumbing tools declared obsolete by Luigi."] },
-            { threshold: 10000, lines: ["National Pasta Day declared 365 days a year.", "Luigi's mustache can now be seen from space.", "Ghost population drops as vacuums improve.", "Scientists wonder: 'Is Luigi made of spaghetti?'", "Dinosaur Land renamed 'Luigiville'."] },
-            { threshold: 100000, lines: ["World Economy switches to Meatball Standard.", "Bowser retires to open a modest pizzeria.", "Green caps are now mandatory headwear.", "Luigi accidentally jumps over the moon.", "Fire flowers used to heat entire cities."] },
-            { threshold: 1000000, lines: ["The Luigipocalypse has begun.", "Gravity fails as Luigi jumps too much.", "Intergalactic spaghetti storm approaching.", "Luigi is now the primary source of world heat.", "Universe revealed to be inside a giant green sock."] },
-            { threshold: 1000000000, lines: ["Reality collapsing into one giant 'That's Mama Luigi'.", "Golden Caps discovered in deep space.", "Luigi transcends time and plumbing.", "Every molecule in the universe is now a Luigi.", "Game Dev says: 'Please stop clicking, he's too powerful!'"] }
-        ];
-
-        let lastHeadline = "";
-        function updateNews() {
-            let ticker = document.getElementById('ticker-text');
-            let possibleLines = newsData[0].lines;
-            for (let i = newsData.length - 1; i >= 0; i--) {
-                if (allTimeLuigis >= newsData[i].threshold) {
-                    possibleLines = newsData[i].lines;
-                    break;
-                }
-            }
-            let newLine = possibleLines[Math.floor(Math.random() * possibleLines.length)];
-            if(newLine !== lastHeadline) {
-                ticker.innerText = newLine;
-                lastHeadline = newLine;
-            }
-        }
-
-        // Initialization
         const upgrades = [];
-        for(let i=0; i<100; i++) upgrades.push({ id: i, name: "Gear #"+(i+1), cost: Math.floor(10 * Math.pow(1.3, i)), power: Math.floor(1 * Math.pow(1.35, i)), count: 0 });
-        const marketItems = [];
-        for(let i=0; i<20; i++) marketItems.push({ id: i, name: "Gold Mult #"+(i+1), cost: Math.floor(Math.pow(5, i+1)), mult: 2, bought: false });
-        const trophies = [];
-        for(let i=0; i<20; i++) trophies.push({ id: i, name: "Trophy #"+(i+1), goal: Math.pow(10, i+2) });
+        for(let i=0; i<100; i++) {
+            upgrades.push({ id: i, name: "Gear #"+(i+1), baseCost: 15 * Math.pow(1.28, i), power: 1.5 * Math.pow(1.32, i), count: 0 });
+        }
+        const market = [];
+        for(let i=0; i<20; i++) {
+            market.push({ id: i, name: "Mult x2 #"+(i+1), cost: Math.pow(5, i+1), bought: false });
+        }
+        const headlines = ["Local man finds green hat.", "Pasta water found in reservoir.", "Luigi forgets how to jump.", "Is it pasta? Or destiny?", "Green socks up 2%.", "Luigi carrying 100 meatballs.", "Goomba spotted at park.", "Mansion bill is too high.", "Mama Luigi is his legal name.", "Pasta shortages reported.", "Yoshi eats park benches.", "Castle deeds traded for pasta.", "Koopa hates green.", "Magic beans found.", "Goombas want better hats.", "Mustache seen from space.", "Ghost population drops.", "Is Luigi made of pasta?", "Dinosaur Land renamed.", "Fire flowers used as heaters.", "Meatball Standard Economy.", "Bowser retires to open a modest pizzeria.", "Green caps mandatory.", "Luigi jumps over moon.", "The Luigipocalypse has begun.", "Gravity fails.", "Intergalactic spaghetti storm.", "Luigi is world heat source.", "Universe is inside a green sock.", "Stop clicking!", "Magic carpet licenses required.", "Dino eggs hatch chickens.", "New bird species found.", "Vacuum bag full of lint.", "Meatball rain predicted.", "Pipe system is a circle.", "Green sock stock surge.", "Luigi needs a snack.", "Bowser invites Luigi to dinner.", "Spiny shells banned.", "Lakitu starts delivery.", "Toad is in another restaurant.", "Mama Luigi flying.", "Stolen hats returned.", "Ghost maps upside down.", "Castle deeds for pasta.", "Plumber trips, saves day.", "Green is the new red.", "100% Organic Kingdom.", "Brick blocks are cake.", "Frog suits in Paris.", "Star man blindness.", "Luigi finds twin.", "Spaghetti trees found.", "Pasta Day every day.", "Chocolate coins found.", "Hammer Bros union.", "Bullet Bill mailman.", "Wario buys Luigi badges.", "Koopa shell helmets.", "Lake is Minestrone.", "Pasta Museum opens.", "Security piranha plants.", "Marshmallow clouds.", "Yoshi fruit snacks.", "Tomato sauce lava.", "Bright green shirt.", "Secret kitchen pipe.", "Meatball panic.", "Premium sauce oil.", "Pasta for Peace.", "Jump earthquake.", "Sentient mushrooms.", "Hug a Boo.", "Thwomp percussion.", "Dry Bones moisturizer.", "Swimming Cheep Cheeps.", "Mole digs to China.", "Ink art movement.", "Chomp door knockers.", "Wiggler anger management.", "Pokey coat rack.", "Baguette magic wand.", "Circus Lemmy.", "Symphony of Meatball.", "Morton wins eating contest.", "Hair gel Iggy.", "Luxury rings Wendy.", "Power pink Roy.", "DJ Larry.", "Spicy science magic.", "Heating Reznor.", "Football Chuck.", "Broccoli vacuum.", "Mama Luigi transcends.", "Atom Luigis.", "Final pasta cooked.", "Infinity Luigi.", "You are Mama Luigi."];
 
         function clickLuigi() {
-            let gain = 1 * multiplier;
-            luigis += gain; allTimeLuigis += gain;
-            playSound('clickSound'); updateUI();
-        }
-
-        function playSound(id) { let s = document.getElementById(id); s.currentTime = 0; s.play().catch(() => {}); }
-
-        function toggleMusic() {
-            let m = document.getElementById('bgMusic');
-            musicPlaying ? m.pause() : m.play().catch(() => {});
-            musicPlaying = !musicPlaying;
+            let gain = (1 * multi) * (1 + buff / 100);
+            if(frenzy) gain *= 77;
+            score += gain; allTime += gain;
+            meter += 4;
+            if(meter >= 100) { meter = 0; buff += 1; }
+            playSound('clickSound');
+            updateUI();
         }
 
         function buyUpgrade(id) {
             let up = upgrades[id];
-            if(luigis >= up.cost) {
-                luigis -= up.cost; up.count++; up.cost = Math.floor(up.cost * 1.3);
-                playSound('screamSound'); updateUI(); renderTab();
+            let cost = Math.floor(up.baseCost * Math.pow(1.15, up.count));
+            if(score >= cost) {
+                score -= cost; up.count++;
+                playSound('screamSound');
+                renderTab(); updateUI();
             }
         }
 
         function buyMarket(id) {
-            let item = marketItems[id];
-            if(goldenCaps >= item.cost && !item.bought) {
-                goldenCaps -= item.cost; item.bought = true; multiplier *= item.mult;
-                updateUI(); renderTab();
+            let m = market[id];
+            if(caps >= m.cost && !m.bought) {
+                caps -= m.cost; m.bought = true; multi *= 2;
+                renderTab(); updateUI();
             }
         }
 
         function prestige() {
-            let gain = Math.floor(Math.sqrt(allTimeLuigis / 1000000)) - goldenCaps;
-            if(gain <= 0) { alert("Need 1,000,000 All-Time Luigis!"); return; }
-            if(confirm("Prestige? Keep Caps & Mults, lose Luigis & Items!")) {
-                goldenCaps += gain; luigis = 0;
-                upgrades.forEach((u, i) => { u.count = 0; u.cost = Math.floor(10 * Math.pow(1.3, i)); });
-                updateUI(); renderTab();
-            }
+            let p = Math.floor(Math.sqrt(allTime / 1000000)) - caps;
+            if(p <= 0) return alert("Need 1,000,000 Total Luigis!");
+            caps += p; score = 0;
+            upgrades.forEach(u => u.count = 0);
+            renderTab(); updateUI();
+        }
+
+        function playSound(id) { let s = document.getElementById(id); s.currentTime=0; s.play().catch(()=>{}); }
+
+        function toggleMusic() {
+            let m = document.getElementById('bgMusic');
+            let b = document.getElementById('m-btn');
+            musicOn ? m.pause() : m.play().catch(()=>alert("Click Luigi first!"));
+            musicOn = !musicOn;
+            b.innerText = musicOn ? "⏸ Pause Music" : "🎵 Play Music";
         }
 
         function switchTab(t) {
             currentTab = t;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + t).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + (t=='upgrades'?'up':t=='market'?'mkt':'tro')).classList.add('active');
             renderTab();
         }
 
         function renderTab() {
-            let container = document.getElementById('tab-content'); container.innerHTML = "";
+            let cont = document.getElementById('tab-content');
+            cont.innerHTML = "";
             if(currentTab === 'upgrades') {
-                upgrades.forEach(up => {
-                    container.innerHTML += `<div class="item-row"><div><strong>${up.name}</strong><br><small>LPS: ${up.power} | Owned: ${up.count}</small></div><button class="upgrade-btn" ${luigis < up.cost ? 'disabled' : ''} onclick="buyUpgrade(${up.id})">${up.cost.toLocaleString()}</button></div>`;
+                upgrades.forEach(u => {
+                    let cost = Math.floor(u.baseCost * Math.pow(1.15, u.count));
+                    cont.innerHTML += `<div class="item-row"><div><strong>${u.name}</strong> (${u.count})</div><button class="upgrade-btn" id="up-btn-${u.id}" onclick="buyUpgrade(${u.id})">${cost.toLocaleString()}</button></div>`;
                 });
             } else if(currentTab === 'market') {
-                marketItems.forEach(item => {
-                    container.innerHTML += `<div class="item-row"><div><strong>${item.name}</strong><br><small>Effect: x${item.mult}</small></div><button class="upgrade-btn" style="background:#ffd700; color:black;" ${ (goldenCaps < item.cost || item.bought) ? 'disabled' : ''} onclick="buyMarket(${item.id})">${item.bought ? 'OWNED' : item.cost + ' Caps'}</button></div>`;
+                market.forEach(m => {
+                    cont.innerHTML += `<div class="item-row"><div><strong>${m.name}</strong></div><button class="upgrade-btn" style="background:#ffd700;color:black;" id="mkt-btn-${m.id}" onclick="buyMarket(${m.id})">${m.bought?'OWNED' : m.cost+' Caps'}</button></div>`;
                 });
-            } else if(currentTab === 'trophies') {
-                trophies.forEach(t => {
-                    let unlocked = allTimeLuigis >= t.goal;
-                    container.innerHTML += `<div class="item-row" style="opacity: ${unlocked ? 1 : 0.4}"><div><strong>${unlocked ? '🏆' : '🔒'} ${t.name}</strong><br><small>Goal: ${t.goal.toLocaleString()} Luigis</small></div></div>`;
-                });
+            } else {
+                for(let i=0; i<20; i++) {
+                    let goal = Math.pow(10, i+2);
+                    let ok = allTime >= goal;
+                    cont.innerHTML += `<div class="item-row" style="opacity:${ok?1:0.3}"><div>Trophy #${i+1}</div><div>${ok?'🏆':'🔒'}</div></div>`;
+                }
             }
         }
 
         function updateUI() {
-            document.getElementById('count').innerText = Math.floor(luigis).toLocaleString();
-            document.getElementById('caps-text').innerText = goldenCaps.toLocaleString();
-            let totalLps = upgrades.reduce((sum, up) => sum + (up.power * up.count), 0) * multiplier;
-            document.getElementById('lps-text').innerText = Math.floor(totalLps).toLocaleString();
-            let pending = Math.floor(Math.sqrt(allTimeLuigis / 1000000)) - goldenCaps;
-            document.getElementById('pending-caps').innerText = Math.max(0, pending);
+            document.getElementById('count').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('caps-text').innerText = caps.toLocaleString();
+            document.getElementById('stat-buff').innerText = buff;
+            document.getElementById('meter-fill').style.width = meter + "%";
+            let lps = upgrades.reduce((s, u) => s + (u.power * u.count), 0) * multi * (1 + buff/100);
+            document.getElementById('lps-text').innerText = Math.floor(lps).toLocaleString();
+            let p = Math.floor(Math.sqrt(allTime / 1000000)) - caps;
+            document.getElementById('pending-caps').innerText = Math.max(0, p);
+
+            if(currentTab === 'upgrades') {
+                upgrades.forEach(u => {
+                    let cost = Math.floor(u.baseCost * Math.pow(1.15, u.count));
+                    let btn = document.getElementById('up-btn-' + u.id);
+                    if(btn) btn.disabled = (score < cost);
+                });
+            } else if(currentTab === 'market') {
+                market.forEach(m => {
+                    let btn = document.getElementById('mkt-btn-' + m.id);
+                    if(btn) btn.disabled = (caps < m.cost || m.bought);
+                });
+            }
+
+            headlineTimer++;
+            if (headlineTimer >= 100) { 
+                const idx = Math.min(Math.floor(allTime / 1000), headlines.length - 1);
+                currentHeadline = headlines[idx];
+                headlineTimer = 0;
+            }
+            const tick = document.getElementById('ticker-text');
+            if(tick.innerText !== currentHeadline) tick.innerText = currentHeadline;
         }
 
-        // Ticker logic: Update headline every 10 seconds
-        setInterval(updateNews, 10000);
+        function clickMeatball() {
+            document.getElementById('meatball').style.display = 'none';
+            frenzy = true; document.getElementById('game-area').style.background = "#fff176";
+            setTimeout(() => { frenzy = false; document.getElementById('game-area').style.background = "#c8e6c9"; }, 15000);
+        }
 
+        // --- LOOPS & AUTO-SAVE ---
         setInterval(() => {
-            let totalLps = upgrades.reduce((sum, up) => sum + (up.power * up.count), 0) * multiplier;
-            luigis += (totalLps / 10); allTimeLuigis += (totalLps / 10);
+            let lps = (upgrades.reduce((s, u) => s + (u.power * u.count), 0) * multi * (1 + buff/100)) / 10;
+            score += lps; allTime += lps;
             updateUI();
-            let buttons = document.querySelectorAll('.upgrade-btn');
-            if(buttons.length > 0 && currentTab === 'upgrades') {
-                upgrades.forEach((up, i) => { if(buttons[i]) buttons[i].disabled = (luigis < up.cost); });
-            }
         }, 100);
 
-        window.onload = () => { renderTab(); updateUI(); updateNews(); };
-        function saveGame() { alert("Saved!"); }
-        function resetGame() { if(confirm("Wipe everything?")) location.reload(); }
+        setInterval(() => {
+            let m = document.getElementById('meatball');
+            m.style.left = (Math.random()*80)+"%"; m.style.top = (Math.random()*80)+"%";
+            m.style.display = 'block'; setTimeout(() => m.style.display='none', 6000);
+        }, 45000);
+
+        // Auto-save every 15 seconds
+        setInterval(() => { saveGame(false); }, 15000);
+
+        function saveGame(manual) {
+            const d = { score, allTime, caps, multi, buff, upCounts: upgrades.map(u=>u.count), mktBought: market.map(m=>m.bought) };
+            localStorage.setItem("ML_SAVE", JSON.stringify(d));
+            
+            // Show popup
+            const pop = document.getElementById('save-popup');
+            pop.style.display = 'block';
+            setTimeout(() => { pop.style.display = 'none'; }, 2000);
+            if(manual) alert("Game Saved Manually!");
+        }
+
+        function loadGame() {
+            const d = JSON.parse(localStorage.getItem("ML_SAVE"));
+            if(d) {
+                score = d.score; allTime = d.allTime; caps = d.caps; multi = d.multi; buff = d.buff || 0;
+                if(d.upCounts) d.upCounts.forEach((c, i) => { if(upgrades[i]) upgrades[i].count = c; });
+                if(d.mktBought) d.mktBought.forEach((b, i) => { if(market[i]) market[i].bought = b; });
+            }
+            renderTab(); updateUI();
+        }
+
+        function resetGame() { if(confirm("Are you sure? You will lose all your pasta!")) { localStorage.clear(); location.reload(); } }
+        
+        window.onload = loadGame;
     </script>
 </body>
 </html>
