@@ -1,0 +1,20 @@
+Package: mama-luigi-clicker
+Version: 1.0.1
+License: unknown
+Vendor: Malice802 <malice802@example.com>
+Architecture: amd64
+Maintainer: Malice802 <malice802@example.com>
+Installed-Size: 265472
+Depends: libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils, libatspi2.0-0, libuuid1, libsecret-1-0
+Recommends: libappindicator3-1
+Homepage: https://example.com
+Priority: optional
+Section: default
+Filename: pool/main/m/mama-luigi-clicker/mama-luigi-clicker_1.0.1_amd64.deb
+Size: 88862588
+SHA256: 3ea26de18bcd64a196a3c2b33b0da4e04c26caa3dbc48552f3b4aac018ba6803
+SHA1: 301c12a439196ba24f5b038e004674e9c21c6c0f
+MD5sum: f9a70bde31590db43047a755d2619adb
+Description: 
+  Mama Luigi Clicker: Shadow Realm Edition
+
