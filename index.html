@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mama Luigi Clicker: Shadow Realm Edition</title>
+    <title>Mama Luigi Clicker: Konami Edition (News Update)</title>
     <style>
         body { text-align: center; font-family: 'Arial', sans-serif; background: #e8f5e9; color: #333; display: flex; flex-direction: column; height: 100vh; margin: 0; overflow: hidden; transition: background 0.5s, color 0.5s; }
         
@@ -17,9 +17,12 @@
         body.dark-mode #meter-container { border: 2px solid #777; }
 
         #header { background: #1b5e20; color: white; padding: 5px; border-bottom: 4px solid #ffd700; transition: 0.5s; }
-        #news-container { background: #222; color: #0f0; padding: 10px; font-family: monospace; height: 20px; overflow: hidden; white-space: nowrap; border-bottom: 2px solid #1b5e20; }
-        #ticker-text { display: inline-block; animation: marquee 40s linear infinite; }
-        @keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+        
+        /* Interactive Ticker Style */
+        #news-container { background: #222; color: #0f0; padding: 10px; font-family: monospace; height: 25px; overflow: hidden; border-bottom: 2px solid #1b5e20; cursor: pointer; }
+        #ticker-text { display: inline-block; white-space: nowrap; transition: color 0.2s; }
+        .ticker-urgent { color: #ff5252 !important; font-weight: bold; animation: blink 0.5s infinite; text-decoration: underline; }
+        @keyframes blink { 50% { opacity: 0.5; } }
 
         #main-container { display: flex; flex: 1; overflow: hidden; }
         #game-area { flex: 1; padding: 20px; background: #c8e6c9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-right: 4px solid #1b5e20; transition: 0.5s; }
@@ -34,20 +37,17 @@
 
         #sidebar { flex: 1; background: white; display: flex; flex-direction: column; transition: 0.5s; }
         .tab-bar { display: flex; background: #333; }
-        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; color: white; font-weight: bold; background: #333; }
+        .tab-btn { flex: 1; padding: 12px; border: none; cursor: pointer; color: white; font-weight: bold; background: #333; font-size: 10px; }
         .tab-btn.active { background: #4caf50; }
         #tab-content { flex: 1; overflow-y: scroll; padding: 15px; }
 
-        /* Bulk Buy Buttons */
         .bulk-bar { display: flex; padding: 5px; background: #ddd; justify-content: space-around; }
         body.dark-mode .bulk-bar { background: #333; }
         .bulk-btn { border: none; background: transparent; cursor: pointer; font-weight: bold; opacity: 0.5; color: inherit; }
         .bulk-btn.active { opacity: 1; text-decoration: underline; color: #1b5e20; }
-        body.dark-mode .bulk-btn.active { color: #69f0ae; }
 
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 5px; text-align: left; }
         
-        /* Daily Special Glow */
         .special-active { border: 2px solid #ffd700 !important; background: #fffde7 !important; box-shadow: 0 0 10px gold; }
         body.dark-mode .special-active { background: #424200 !important; border-color: #ffea00 !important; }
 
@@ -59,21 +59,23 @@
         .sys-btn { margin: 5px; padding: 8px; cursor: pointer; font-weight: bold; border-radius: 5px; border: 1px solid #999; }
 
         .click-popup { position: absolute; color: #2e7d32; font-weight: bold; pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 200; font-size: 20px; text-shadow: 1px 1px white; }
-        body.dark-mode .click-popup { color: #69f0ae; text-shadow: 1px 1px black; }
         @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-120px); } }
 
         #save-popup { position: fixed; bottom: 20px; left: 20px; background: #333; color: white; padding: 10px; border-radius: 5px; display: none; z-index: 1000; font-size: 12px; border: 1px solid gold; }
         .achieved { background: #fff9c4 !important; border: 1px solid #fbc02d !important; }
         body.dark-mode .achieved { background: #424200 !important; border: 1px solid #ffea00 !important; color: #fff; }
         
-        #ghost-btn { display: none; background: #555; color: #fff; }
+        #ghost-btn { display: none; }
     </style>
 </head>
 <body>
 
     <div id="save-popup">💾 Progress Saved!</div>
-    <div id="header"><h2 style="margin:0;">Mama Luigi Clicker: Shadow Fixed</h2></div>
-    <div id="news-container"><div id="ticker-text">Welcome! Click Luigi to begin...</div></div>
+    <div id="header"><h2 style="margin:0;">Mama Luigi Clicker: Konami Edition</h2></div>
+    
+    <div id="news-container" onclick="clickHeadline()">
+        <div id="ticker-text">Welcome! Click Luigi to begin...</div>
+    </div>
 
     <div id="main-container">
         <div id="game-area">
@@ -102,12 +104,14 @@
         <div id="sidebar">
             <div class="tab-bar">
                 <button id="btn-up" class="tab-btn active" onclick="switchTab('upgrades')">ITEMS</button>
+                <button id="btn-staff" class="tab-btn" onclick="switchTab('staff')">STAFF</button>
+                <button id="btn-res" class="tab-btn" onclick="switchTab('research')">RESEARCH</button>
                 <button id="btn-mkt" class="tab-btn" onclick="switchTab('market')">MARKET</button>
                 <button id="btn-ach" class="tab-btn" onclick="switchTab('achieve')">SECRETS</button>
             </div>
             
             <div class="bulk-bar" id="bulk-bar">
-                <span style="font-size:12px; align-self:center;">BUY:</span>
+                <span style="font-size:11px; align-self:center;">BUY:</span>
                 <button class="bulk-btn active" id="buy-1" onclick="setBulk(1)">x1</button>
                 <button class="bulk-btn" id="buy-10" onclick="setBulk(10)">x10</button>
                 <button class="bulk-btn" id="buy-100" onclick="setBulk(100)">x100</button>
@@ -118,30 +122,42 @@
     </div>
 
     <script>
-        // --- VARIABLES ---
-        let score = 0, allTime = 0, caps = 0, multi = 1, buff = 0, meter = 0;
-        let prestigeCount = 0; 
-        let currentTab = 'upgrades', musicOn = false, frenzy = false;
-        let ghostMode = false;
-        let buyAmount = 1;
-        
-        let headlineTimer = 0, meatballClicks = 0;
-        let currentHeadline = "Welcome! Click Luigi to begin...";
-        
-        let specialIdx = -1; 
-        let specialTimer = 0; 
+        // --- DATA ---
+        let score = 0, allTime = 0, caps = 0, multi = 1, buff = 0, meter = 0, prestigeCount = 0;
+        let currentTab = 'upgrades', musicOn = false, frenzy = false, ghostMode = false, marioMode = false, buyAmount = 1;
+        let specialIdx = -1, urgentHeadline = false, meatballClicks = 0;
 
         const funnyNames = ["Single Dry Noodle", "Mama's Hat Starch", "Yoshi's Tax Returns", "Stale Breadsticks", "Illegal Green Dye", "Mushroom Kingdom Dirt", "Koopa Shell Cereal", "Luigi's Left Sock", "Mustache Wax", "Poltergust Bag", "Fire Flower Seeds", "Bowser's Pizza Flyer", "Goomba Boots", "Warp Pipe Plunger", "Double-A Batteries", "Magic Bean Can", "A Very Loud Scream", "Toad's Therapy Bill", "Green Mario Merch", "Expired Spaghetti", "Gold Coin Chocolate", "Lakitu's Fishing Pole", "Spinning Hammer", "Bullet Bill Mailbox", "Whomp Glue", "Boo's Cloak", "Dry Bones Calcium", "Cheep Cheep Tank", "Mole Shovel", "Pokey's Sunscreen", "Chain Chomp Leash", "Wiggler's Tea", "Magikoopa Baguette", "Lemmy's Ball", "Iggy's Hair Gel", "Wendy's Ring", "Roy's Sunglasses", "Larry's DJ Booth", "Morton's Cookie", "Ludwig's Piano", "Kamek's Science", "Reznor's Heater", "Chuck's Football", "E. Gadd's Coffee", "Toadette's Crown", "B Dasher Tires", "Blue Shell Insurance", "Coconut Mall Map", "Rainbow Road Rail", "Item Box Part", "Banana Peel", "Green Shell Rocket", "Bob-omb Fuse", "Lightning Battery", "Fake Item Box", "Star Power Battery", "Blooper's Ink", "Monty Mole Specs", "Petey's Water Can", "King Boo's Crown", "Wario's Garlic", "Waluigi's Racket", "Daisy's Flowers", "Rosalina's Star Bits", "Luma's Snack", "Baby Mario Diaper", "Baby Luigi Pacifier", "Professor's Map", "Mansion Key", "Vacuum Valve", "Meatball Seasoning", "Mama's Apron", "Sauce Perfume", "Heavy Metal Meatball", "Deep Fried Mushroom", "Ooze Ravioli", "Forbidden Tortellini", "Yoshi's Stolen Egg", "Birdo's Pink Bow", "Shy Guy Mask", "Phanto's Face", "Birdo's Projectile", "Snifit Mouthpiece", "Ninji Star", "Pidget's Carpet", "Clawgrip's Claw", "Fryguy's Lighter", "Triclyde's Hat", "Mouser's Bomb", "Wart's Veggies", "1-Up Mushroom", "Mega Mushroom", "Mini Mushroom", "Poison Mushroom", "Bee Suit", "Tanooki Leaf", "Cape Feather", "Ice Flower", "Penguin Suit", "Infinite Spaghetti"];
 
+        // NEW: Funny News Headlines Pool
+        const funnyHeadlines = [
+            "Local plumber confused by 'Mama' title; more at 11.",
+            "Warp Pipe traffic jam caused by excessive napping.",
+            "Meatball prices skyrocket as Empire demand peaks.",
+            "Ghost Luigi spotted in kitchen; 'He just wanted a bagel,' says witness.",
+            "Spaghetti meter reaches critical levels; experts advise more sauce.",
+            "Princess Peach announces 'No Mushrooms in Pasta' policy.",
+            "Wario seen hoarding Golden Meatballs under his hat.",
+            "New study shows 99% of Luigis prefer being clicked.",
+            "Toad complains about 'unpaid internship' in the Kitchen Management System.",
+            "E. Gadd invents a vacuum that only sucks up dry noodles."
+        ];
+
         const upgrades = [];
-        for(let i=0; i<100; i++) {
-            upgrades.push({ id: i, name: funnyNames[i], baseCost: 15 * Math.pow(1.30, i), power: 1.2 * Math.pow(1.35, i), count: 0 });
-        }
+        for(let i=0; i<100; i++) upgrades.push({ id: i, name: funnyNames[i], baseCost: 15 * Math.pow(1.30, i), power: 1.2 * Math.pow(1.35, i), count: 0 });
+
+        const research = [];
+        for(let i=1; i<=50; i++) research.push({ id: i, name: "Tier " + i + " Research", desc: "Permanent +5% Production Boost", cost: Math.floor(10 * Math.pow(1.4, i)), bought: false });
 
         const market = [];
-        for(let i=0; i<20; i++) {
-            market.push({ id: i, name: "Gold Mult x2 #"+(i+1), cost: Math.pow(5, i+1), bought: false });
-        }
+        for(let i=0; i<20; i++) market.push({ id: i, name: "Gold Mult x2 #"+(i+1), cost: Math.pow(5, i+1), bought: false });
+
+        const managers = [
+            { id: 0, name: "Chef Toad", desc: "Auto-clicks Mama Luigi 1x per second.", cost: 500000, bought: false },
+            { id: 1, name: "Princess Peach", desc: "Provides a global 1.5x Production multiplier.", cost: 5000000000, bought: false },
+            { id: 2, name: "Wario", desc: "Golden Meatballs spawn twice as fast.", cost: 250000000000, bought: false },
+            { id: 3, name: "Prof. E. Gadd", desc: "Reduces Research Caps costs by 20%.", cost: 10000000000000, bought: false }
+        ];
 
         const achievements = [
             { id: 0, name: "Baby Plumber", desc: "1,000 Total Luigis", check: () => allTime >= 1000, done: false },
@@ -151,169 +167,150 @@
             { id: 4, name: "Shadow Realm", desc: "Prestige 5 Times", check: () => prestigeCount >= 5, done: false }
         ];
 
-        // --- CORE LOGIC ---
+        // --- THE KONAMI CODE ---
+        const konamiSequence = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+        let konamiPosition = 0;
+        document.addEventListener('keydown', function(e) {
+            let key = e.key.toLowerCase();
+            if (key === konamiSequence[konamiPosition]) {
+                konamiPosition++;
+                if (konamiPosition === konamiSequence.length) {
+                    toggleMarioMode();
+                    konamiPosition = 0;
+                }
+            } else {
+                konamiPosition = (key === 'arrowup') ? 1 : 0;
+            }
+        });
 
+        function toggleMarioMode() {
+            marioMode = !marioMode;
+            let img = document.getElementById('luigi');
+            const pop = document.getElementById('save-popup');
+            if(marioMode) {
+                img.src = "Mama Mario.png";
+                pop.innerText = "🍄 IT'S-A ME! MAMA MARIO!";
+            } else {
+                img.src = ghostMode ? "Ghost Mama Luigi.png" : "Mama Luigi.png";
+                pop.innerText = "🍄 Back to Mama Luigi!";
+            }
+            pop.style.display = 'block';
+            setTimeout(() => pop.style.display = 'none', 3000);
+        }
+
+        // --- CORE MATH HELPERS ---
+        function getStaffMult() { return managers[1].bought ? 1.5 : 1; }
+        function getResearchCost(r) { return managers[3].bought ? Math.floor(r.cost * 0.8) : r.cost; }
+
+        // --- CORE ACTION ---
         function clickLuigi() {
-            let gain = (1 * multi) * (1 + buff / 100);
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let gain = (multi * resMult * getStaffMult()) * (1 + buff / 100);
             if(frenzy) gain *= 77;
             score += gain; allTime += gain;
-            meter += 4;
-            if(meter >= 100) { meter = 0; buff += 1; renderTab(); }
-            playSound('clickSound');
-            checkAchievements();
-            updateUI();
+            meter += 4; if(meter >= 100) { meter = 0; buff += 1; renderTab(); }
+            playSound('clickSound'); checkAchievements(); updateUI();
+        }
+
+        function autoClickLuigi() {
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let gain = (multi * resMult * getStaffMult()) * (1 + buff / 100);
+            if(frenzy) gain *= 77;
+            score += gain; allTime += gain;
+            meter += 4; if(meter >= 100) { meter = 0; buff += 1; renderTab(); }
+            checkAchievements(); updateUI();
         }
 
         function spawnPopup(e) {
-            let gain = (1 * multi) * (1 + buff / 100);
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let gain = (multi * resMult * getStaffMult()) * (1 + buff / 100);
             if(frenzy) gain *= 77;
             const p = document.createElement('div');
-            p.className = 'click-popup';
-            p.innerText = "+" + Math.floor(gain).toLocaleString();
-            p.style.left = (e.clientX - 20) + "px";
-            p.style.top = (e.clientY - 20) + "px";
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 1000);
+            p.className = 'click-popup'; p.innerText = "+" + Math.floor(gain).toLocaleString();
+            p.style.left = (e.clientX - 20) + "px"; p.style.top = (e.clientY - 20) + "px";
+            document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
         }
-
-        // --- BULK BUY LOGIC ---
-        function setBulk(n) {
-            buyAmount = n;
-            document.querySelectorAll('.bulk-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('buy-'+n).classList.add('active');
-            renderTab();
-        }
-
-        function getCost(u, n) {
-            let total = 0;
-            for(let i=0; i<n; i++) {
-                total += Math.floor(u.baseCost * Math.pow(1.15, u.count + i));
-            }
-            return total;
-        }
-
-        function buyUpgrade(id) {
-            let up = upgrades[id];
-            let cost = getCost(up, buyAmount);
-            if(score >= cost) {
-                score -= cost;
-                up.count += buyAmount;
-                playSound('screamSound');
-                renderTab(); updateUI();
-            }
-        }
-
-        function buyMarket(id) {
-            let m = market[id];
-            if(caps >= m.cost && !m.bought) {
-                caps -= m.cost; m.bought = true; multi *= 2;
-                renderTab(); updateUI();
-            }
-        }
-
-        // --- PRESTIGE (FIXED) ---
 
         function prestige() {
             let p = Math.floor(Math.sqrt(allTime / 1000000)) - caps;
-            if(p <= 0) return alert("Need 1,000,000 Total Luigis (Lifetime) to get more Caps!");
-            
-            // Apply Prestige
-            caps += p; 
-            score = 0; 
-            // FIXED: Do NOT reset allTime. 'allTime' must persist for the formula to work.
-            
-            prestigeCount++;
+            if(p <= 0) return alert("Need 1,000,000 Total Luigis for more Caps!");
+            caps += p; score = 0; prestigeCount++;
             upgrades.forEach(u => u.count = 0);
-            
-            // Check for Ghost Mode unlock
-            checkGhostUnlock();
-            
-            renderTab(); 
-            updateUI();
-            
-            alert("Prestige Successful! You now have " + caps + " Caps.");
+            managers.forEach(m => m.bought = false);
+            checkGhostUnlock(); renderTab(); updateUI(); alert("Prestige Successful!");
         }
 
-        function checkGhostUnlock() {
-            if(prestigeCount >= 5) {
-                document.getElementById('ghost-btn').style.display = "inline-block";
-            }
-        }
+        function checkGhostUnlock() { if(prestigeCount >= 5) document.getElementById('ghost-btn').style.display = "inline-block"; }
 
         function toggleGhostMode() {
-            ghostMode = !ghostMode;
-            let body = document.body;
-            let img = document.getElementById('luigi');
-            let btn = document.getElementById('ghost-btn');
-            
-            if(ghostMode) {
-                body.classList.add('dark-mode');
-                img.src = "Ghost Mama Luigi.png";
-                btn.innerText = "☀️ Return to Light";
-                btn.style.background = "#fff"; btn.style.color = "#000";
-            } else {
-                body.classList.remove('dark-mode');
-                img.src = "Mama Luigi.png";
-                btn.innerText = "👻 Summon Ghost";
-                btn.style.background = "#555"; btn.style.color = "#fff";
-            }
-            // Switch music if playing
-            if(musicOn) {
-                let m1 = document.getElementById('bgMusic');
-                let m2 = document.getElementById('ghostMusic');
-                m1.pause(); m2.pause();
-                let track = ghostMode ? m2 : m1;
-                track.currentTime = 0; track.play();
-            }
+            ghostMode = !ghostMode; document.getElementById('game-area').style.background = "";
+            let body = document.body; let img = document.getElementById('luigi');
+            if(ghostMode) { body.classList.add('dark-mode'); img.src = "Ghost Mama Luigi.png"; } 
+            else { body.classList.remove('dark-mode'); img.src = marioMode ? "Mama Mario.png" : "Mama Luigi.png"; }
+            if(musicOn) { let m1 = document.getElementById('bgMusic'), m2 = document.getElementById('ghostMusic'); m1.pause(); m2.pause(); (ghostMode?m2:m1).play(); }
         }
 
-        // --- TAB & UI RENDERING ---
+        function buyUpgrade(id) { 
+            let up = upgrades[id]; let cost = getCost(up, buyAmount); 
+            if(score >= cost) { score -= cost; up.count += buyAmount; playSound('screamSound'); updateItemRow(id); updateUI(); } 
+        }
 
-        function switchTab(t) {
-            currentTab = t;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(t === 'upgrades' ? 'btn-up' : t === 'market' ? 'btn-mkt' : 'btn-ach').classList.add('active');
-            document.getElementById('bulk-bar').style.display = (t === 'upgrades') ? 'flex' : 'none';
-            renderTab();
+        function buyManager(id) {
+            let mgr = managers[id];
+            if(score >= mgr.cost && !mgr.bought) { score -= mgr.cost; mgr.bought = true; renderTab(); updateUI(); }
+        }
+
+        function buyResearch(id) {
+            let r = research.find(x => x.id === id); let actualCost = getResearchCost(r);
+            if(caps >= actualCost && !r.bought) { caps -= actualCost; r.bought = true; renderTab(); updateUI(); }
+        }
+
+        function updateItemRow(id) {
+            let u = upgrades[id];
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let globalMult = multi * (1 + buff / 100) * resMult * getStaffMult();
+            let isSpecial = (u.id === specialIdx);
+            let rowCount = document.getElementById('count-'+id), rowBtn = document.getElementById('up-btn-'+id), rowLPS = document.getElementById('lps-'+id);
+            if(rowCount) rowCount.innerText = u.count;
+            if(rowBtn) rowBtn.innerText = getCost(u, buyAmount).toLocaleString();
+            if(rowLPS) rowLPS.innerText = "+" + (u.power * globalMult * (isSpecial ? 3 : 1)).toLocaleString(undefined, {maximumFractionDigits: 1}) + " LPS";
         }
 
         function renderTab() {
             let cont = document.getElementById('tab-content');
-            cont.innerHTML = "";
-            let globalMult = multi * (1 + buff / 100);
-
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let globalMult = multi * (1 + buff / 100) * resMult * getStaffMult();
+            let html = "";
             if(currentTab === 'upgrades') {
                 upgrades.forEach(u => {
-                    let cost = getCost(u, buyAmount);
-                    let isSpecial = (u.id === specialIdx);
-                    let powerMult = isSpecial ? 3 : 1; 
-                    
-                    let itemLPS = (u.power * globalMult * powerMult).toLocaleString(undefined, {maximumFractionDigits: 1});
-                    
-                    let rowClass = isSpecial ? "item-row special-active" : "item-row";
-                    let specialText = isSpecial ? "<span style='color:#d50000; font-weight:bold;'>🔥 300% BOOST!</span><br>" : "";
-
-                    cont.innerHTML += `
-                    <div class="${rowClass}">
-                        <div>
-                            <strong>${u.name}</strong> (${u.count})<br>
-                            ${specialText}
-                            <small style="opacity:0.7;">+${itemLPS} LPS</small>
-                        </div>
-                        <button class="upgrade-btn" id="up-btn-${u.id}" onclick="buyUpgrade(${u.id})">
-                            ${cost.toLocaleString()}
-                        </button>
+                    let cost = getCost(u, buyAmount); let isSpecial = (u.id === specialIdx);
+                    let itemLPS = (u.power * globalMult * (isSpecial ? 3 : 1)).toLocaleString(undefined, {maximumFractionDigits: 1});
+                    html += `<div class="item-row ${isSpecial?'special-active':''}" id="row-${u.id}">
+                        <div><strong>${u.name}</strong> (<span id="count-${u.id}">${u.count}</span>)<br>${isSpecial?'<small style="color:red;font-weight:bold;">🔥 300% BOOST!</small><br>':''}<small id="lps-${u.id}">+${itemLPS} LPS</small></div>
+                        <button class="upgrade-btn" id="up-btn-${u.id}" onclick="buyUpgrade(${u.id})" ${score<cost?'disabled':''}>${cost.toLocaleString()}</button>
                     </div>`;
+                });
+            } else if(currentTab === 'staff') {
+                managers.forEach(mgr => {
+                    html += `<div class="item-row">
+                        <div><strong>${mgr.name}</strong><br><small>${mgr.desc}</small></div>
+                        <button class="upgrade-btn" id="mgr-btn-${mgr.id}" style="background:#ff9800; color:#fff;" onclick="buyManager(${mgr.id})" ${score<mgr.cost || mgr.bought?'disabled':''}>${mgr.bought?'HIRED':mgr.cost.toLocaleString()}</button>
+                    </div>`;
+                });
+            } else if(currentTab === 'research') {
+                research.forEach(r => {
+                    let rCost = getResearchCost(r);
+                    html += `<div class="item-row"><div><strong>${r.name}</strong><br><small>${r.desc}</small></div>
+                        <button class="upgrade-btn" style="background:#673ab7" onclick="buyResearch(${r.id})" ${caps<rCost || r.bought?'disabled':''}>${r.bought?'DONE':rCost+' Caps'}</button></div>`;
                 });
             } else if(currentTab === 'market') {
                 market.forEach(m => {
-                    cont.innerHTML += `<div class="item-row"><div><strong>${m.name}</strong></div><button class="upgrade-btn" style="background:#ffd700;color:black;" id="mkt-btn-${m.id}" onclick="buyMarket(${m.id})">${m.bought?'OWNED' : m.cost+' Caps'}</button></div>`;
+                    html += `<div class="item-row"><div><strong>${m.name}</strong></div><button class="upgrade-btn" style="background:#ffd700;color:black;" id="mkt-btn-${m.id}" onclick="buyMarket(${m.id})" ${caps<m.cost || m.bought?'disabled':''}>${m.bought?'OWNED' : m.cost+' Caps'}</button></div>`;
                 });
             } else {
-                achievements.forEach(a => {
-                    cont.innerHTML += `<div class="item-row ${a.done?'achieved':''}"><div><strong>${a.name}</strong><br><small>${a.desc}</small></div><div>${a.done?'🏆':'🔒'}</div></div>`;
-                });
+                achievements.forEach(a => { html += `<div class="item-row ${a.done?'achieved':''}"><div><strong>${a.name}</strong><br><small>${a.desc}</small></div><div>${a.done?'🏆':'🔒'}</div></div>`; });
             }
+            cont.innerHTML = html;
         }
 
         function updateUI() {
@@ -321,130 +318,99 @@
             document.getElementById('caps-text').innerText = caps.toLocaleString();
             document.getElementById('stat-buff').innerText = buff;
             document.getElementById('meter-fill').style.width = meter + "%";
-            
-            let lps = upgrades.reduce((s, u) => {
-                let pMult = (u.id === specialIdx) ? 3 : 1;
-                return s + (u.power * u.count * pMult);
-            }, 0) * multi * (1 + buff/100);
-
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+            let lps = upgrades.reduce((s, u) => s + (u.power * u.count * (u.id === specialIdx ? 3 : 1)), 0) * multi * resMult * getStaffMult() * (1 + buff/100);
             document.getElementById('lps-text').innerText = Math.floor(lps).toLocaleString();
-            
-            // Fixed Pending Formula
-            let p = Math.floor(Math.sqrt(allTime / 1000000)) - caps;
-            document.getElementById('pending-caps').innerText = Math.max(0, p);
+            document.getElementById('pending-caps').innerText = Math.max(0, Math.floor(Math.sqrt(allTime / 1000000)) - caps);
+            if(currentTab === 'upgrades') { upgrades.forEach(u => { let b = document.getElementById('up-btn-'+u.id); if(b) b.disabled = (score < getCost(u, buyAmount)); }); } 
+            else if (currentTab === 'staff') { managers.forEach(mgr => { let b = document.getElementById('mgr-btn-'+mgr.id); if(b) b.disabled = (score < mgr.cost || mgr.bought); }); }
+        }
 
-            if(currentTab === 'upgrades') {
-                upgrades.forEach(u => {
-                    let cost = getCost(u, buyAmount);
-                    let btn = document.getElementById('up-btn-' + u.id);
-                    if(btn) btn.disabled = (score < cost);
-                });
-            } else if(currentTab === 'market') {
-                market.forEach(m => {
-                    let btn = document.getElementById('mkt-btn-' + m.id);
-                    if(btn) btn.disabled = (caps < m.cost || m.bought);
-                });
-            }
-
-            headlineTimer++;
-            if (headlineTimer >= 100) { 
-                const idx = Math.min(Math.floor(allTime / 1000), funnyNames.length - 1);
-                currentHeadline = "Breaking: " + funnyNames[idx] + " spotted in Luigi's kitchen!";
-                headlineTimer = 0;
-            }
+        // --- UPDATED TICKER SYSTEM ---
+        function updateTicker() {
             const tick = document.getElementById('ticker-text');
-            if(tick.innerText !== currentHeadline) tick.innerText = currentHeadline;
-        }
-
-        // --- LOOPS ---
-        setInterval(() => {
-            let lps = upgrades.reduce((s, u) => {
-                let pMult = (u.id === specialIdx) ? 3 : 1;
-                return s + (u.power * u.count * pMult);
-            }, 0) * multi * (1 + buff/100);
-            
-            let gain = lps / 10; 
-            score += gain; allTime += gain;
-            updateUI();
-        }, 100);
-
-        setInterval(() => {
-            specialIdx = Math.floor(Math.random() * 100);
-            currentHeadline = "🔥 SPECIAL EVENT: " + funnyNames[specialIdx] + " IS 300% STRONGER!";
-            headlineTimer = -50; 
-            renderTab();
-            setTimeout(() => { specialIdx = -1; renderTab(); }, 30000); 
-        }, 60000);
-
-        function clickMeatball() {
-            meatballClicks++;
-            document.getElementById('meatball').style.display = 'none';
-            frenzy = true; document.getElementById('game-area').style.background = "#fff176";
-            setTimeout(() => { frenzy = false; document.getElementById('game-area').style.background = ghostMode ? "#1c1c1c" : "#c8e6c9"; }, 15000);
-        }
-        setInterval(() => {
-            let m = document.getElementById('meatball');
-            m.style.left = (Math.random()*80)+"%"; m.style.top = (Math.random()*80)+"%";
-            m.style.display = 'block'; setTimeout(() => m.style.display='none', 6000);
-        }, 45000);
-
-        setInterval(() => { saveGame(false); }, 15000);
-
-        function playSound(id) { let s = document.getElementById(id); s.currentTime=0; s.play().catch(()=>{}); }
-        function toggleMusic() {
-            let m1 = document.getElementById('bgMusic');
-            let m2 = document.getElementById('ghostMusic');
-            let btn = document.getElementById('m-btn');
-            
-            if(musicOn) {
-                m1.pause(); m2.pause();
-                btn.innerText = "🎵 Play Music";
-            } else {
-                let track = ghostMode ? m2 : m1;
-                track.play().catch(()=>alert("Interact first!"));
-                btn.innerText = "⏸ Pause Music";
-            }
-            musicOn = !musicOn;
-        }
-
-        function checkAchievements() {
-            achievements.forEach(a => {
-                if(!a.done && a.check()) {
-                    a.done = true;
-                    const pop = document.getElementById('save-popup');
-                    pop.innerText = "🏆 UNLOCKED: " + a.name; pop.style.display='block';
-                    setTimeout(()=>pop.style.display='none', 3000);
+            if (Math.random() > 0.85) { 
+                urgentHeadline = true; 
+                tick.innerText = "⚠️ URGENT: BOWSER STEALING SAUCE! CLICK HERE TO STOP HIM!"; 
+                tick.className = "ticker-urgent"; 
+            } else { 
+                urgentHeadline = false; 
+                tick.className = "";
+                // 50/50 choice between a specific headline and an item spotted report
+                if (Math.random() > 0.5) {
+                    const hIdx = Math.floor(Math.random() * funnyHeadlines.length);
+                    tick.innerText = "News: " + funnyHeadlines[hIdx];
+                } else {
+                    const idx = Math.min(Math.floor(allTime / 1000), funnyNames.length - 1);
+                    tick.innerText = "News: " + funnyNames[idx] + " spotted in kitchen!"; 
                 }
-            });
+            }
+        }
+        setInterval(updateTicker, 15000);
+
+        function clickHeadline() {
+            if(urgentHeadline) {
+                let bonus = allTime * 0.05 + 5000; score += bonus;
+                alert("Crisis Averted! + " + Math.floor(bonus).toLocaleString() + " Luigis!");
+                urgentHeadline = false; updateTicker(); updateUI();
+            }
         }
 
-        function saveGame(manual) {
-            const d = { score, allTime, caps, multi, buff, meatballClicks, prestigeCount, upCounts: upgrades.map(u=>u.count), mktBought: market.map(m=>m.bought), achs: achievements.map(a=>a.done) };
-            localStorage.setItem("ML_SHADOW_FIXED", JSON.stringify(d));
-            if(!manual) {
-                const pop = document.getElementById('save-popup');
-                pop.innerText = "💾 Auto-Saved!"; pop.style.display='block';
-                setTimeout(()=>pop.style.display='none', 2000);
-            } else {
-                alert("Game Saved!");
-            }
+        function setBulk(n) { buyAmount = n; document.querySelectorAll('.bulk-btn').forEach(b => b.classList.remove('active')); document.getElementById('buy-'+n).classList.add('active'); renderTab(); }
+        function getCost(u, n) { let total = 0; for(let i=0; i<n; i++) total += Math.floor(u.baseCost * Math.pow(1.15, u.count + i)); return total; }
+        function buyMarket(id) { let m = market[id]; if(caps >= m.cost && !m.bought) { caps -= m.cost; m.bought = true; multi *= 2; renderTab(); updateUI(); } }
+        function playSound(id) { let s = document.getElementById(id); s.currentTime=0; s.play().catch(()=>{}); }
+        function toggleMusic() { let m1 = document.getElementById('bgMusic'), m2 = document.getElementById('ghostMusic'), btn = document.getElementById('m-btn'); if(musicOn) { m1.pause(); m2.pause(); btn.innerText = "🎵 Play Music"; } else { (ghostMode?m2:m1).play().catch(()=>alert("Click first!")); btn.innerText = "⏸ Pause Music"; } musicOn = !musicOn; }
+        function checkAchievements() { achievements.forEach(a => { if(!a.done && a.check()) { a.done = true; document.getElementById('save-popup').innerText = "🏆 UNLOCKED: " + a.name; document.getElementById('save-popup').style.display='block'; setTimeout(()=>document.getElementById('save-popup').style.display='none', 3000); } }); }
+        function clickMeatball() { meatballClicks++; document.getElementById('meatball').style.display = 'none'; frenzy = true; document.getElementById('game-area').style.background = "#fff176"; setTimeout(() => { frenzy = false; document.getElementById('game-area').style.background = ""; }, 15000); }
+        function switchTab(t) { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); const map = {'upgrades':'btn-up','staff':'btn-staff','research':'btn-res','market':'btn-mkt','achieve':'btn-ach'}; document.getElementById(map[t]).classList.add('active'); document.getElementById('bulk-bar').style.display = (t === 'upgrades') ? 'flex' : 'none'; renderTab(); }
+
+        function saveGame(m) { 
+            const d = { score, allTime, caps, multi, buff, meatballClicks, prestigeCount, upCounts: upgrades.map(u=>u.count), mktBought: market.map(m=>m.bought), achs: achievements.map(a=>a.done), resBought: research.map(r=>r.bought), mgrBought: managers.map(mgr=>mgr.bought), lastTime: Date.now() }; 
+            localStorage.setItem("ML_OFFLINE_EDITION", JSON.stringify(d)); if(m) alert("Saved!"); 
         }
 
         function loadGame() {
-            const d = JSON.parse(localStorage.getItem("ML_SHADOW_FIXED"));
+            const d = JSON.parse(localStorage.getItem("ML_OFFLINE_EDITION"));
             if(d) {
-                score = d.score; allTime = d.allTime; caps = d.caps; multi = d.multi; buff = d.buff || 0;
-                meatballClicks = d.meatballClicks || 0;
-                prestigeCount = d.prestigeCount || 0; 
+                score = d.score; allTime = d.allTime; caps = d.caps; multi = d.multi; buff = d.buff || 0; meatballClicks = d.meatballClicks || 0; prestigeCount = d.prestigeCount || 0;
                 if(d.upCounts) d.upCounts.forEach((c, i) => { if(upgrades[i]) upgrades[i].count = c; });
                 if(d.mktBought) d.mktBought.forEach((b, i) => { if(market[i]) market[i].bought = b; });
                 if(d.achs) d.achs.forEach((done, i) => { if(achievements[i]) achievements[i].done = done; });
+                if(d.resBought) d.resBought.forEach((b, i) => { if(research[i]) research[i].bought = b; });
+                if(d.mgrBought) d.mgrBought.forEach((b, i) => { if(managers[i]) managers[i].bought = b; });
+                if(d.lastTime) {
+                    let now = Date.now(), diff = (now - d.lastTime) / 1000; 
+                    if(diff > 30) { 
+                        let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1);
+                        let lps = upgrades.reduce((s, u) => s + (u.power * u.count), 0) * multi * resMult * getStaffMult() * (1 + buff/100);
+                        let offlineGain = Math.floor(diff * (lps * 0.5)); 
+                        if(offlineGain > 0) { score += offlineGain; allTime += offlineGain; alert("💤 Napping in the Warp Pipe...\nYou were away for " + Math.floor(diff/60) + " minutes.\nMama Luigi cooked " + offlineGain.toLocaleString() + " Luigis while you were gone!"); }
+                    }
+                }
             }
-            checkGhostUnlock();
-            renderTab(); updateUI();
+            checkGhostUnlock(); renderTab(); updateUI(); spawnMeatballLoop();
+        }
+        function resetGame() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+
+        function spawnMeatballLoop() {
+            let freq = managers[2].bought ? 22500 : 45000;
+            setTimeout(() => {
+                let m = document.getElementById('meatball'); m.style.left = (Math.random()*80)+"%"; m.style.top = (Math.random()*80)+"%"; m.style.display = 'block'; 
+                setTimeout(() => m.style.display='none', 6000); spawnMeatballLoop();
+            }, freq);
         }
 
-        function resetGame() { if(confirm("Reset everything?")) { localStorage.clear(); location.reload(); } }
+        setInterval(() => { 
+            let resMult = research.filter(r=>r.bought).reduce((a,b)=>a+0.05, 1); 
+            let lps = upgrades.reduce((s, u) => s + (u.power * u.count * (u.id === specialIdx ? 3 : 1)), 0) * multi * resMult * getStaffMult() * (1 + buff/100); 
+            score += lps / 10; allTime += lps / 10; updateUI(); 
+        }, 100);
+
+        setInterval(() => { if(managers[0].bought) autoClickLuigi(); }, 1000);
+        setInterval(() => { specialIdx = Math.floor(Math.random() * 100); renderTab(); setTimeout(() => { specialIdx = -1; renderTab(); }, 30000); }, 60000);
+        setInterval(() => { saveGame(false); }, 15000);
+
         window.onload = loadGame;
     </script>
 </body>
