@@ -1,0 +1,18 @@
+Package: mama-luigi-clicker
+Version: 1.0.2
+Architecture: amd64
+Depends: libgtk-3-0, libnotify4, libnss3, xdg-utils, libatspi2.0-0, libdrm2, libgbm1, libxcb-dri3-0, kde-cli-tools | kde-runtime | trash-cli | libglib2.0-bin | gvfs-bin
+Recommends: pulseaudio | libasound2
+Suggests: gir1.2-gnomekeyring-1.0, libgnome-keyring0, lsb-release
+Installed-Size: 311025
+Maintainer: Malice802
+Priority: optional
+Section: utils
+Filename: pool/main/m/mama-luigi-clicker/mama-luigi-clicker_1.0.2_amd64.deb
+Size: 92924656
+SHA256: 73f3863f51154900782d24ccbe9d79e2a732086092d1df4bc7428034d29cc118
+SHA1: 3117650a5973f7453e076995c1961f5c6b61a255
+MD5sum: 422ebd850c92e3d586d6f4d173938c79
+Description: Mama Luigi Clicker: Shadow Realm Edition
+ Mama Luigi Clicker: Shadow Realm Edition
+

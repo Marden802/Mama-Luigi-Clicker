@@ -1,0 +1,19 @@
+Origin: Mama-Luigi-Clicker
+Label: Mama-Luigi-Clicker
+Codename: stable
+Date: Sat, 28 Mar 2026 05:48:10 UTC
+Architectures: amd64
+Components: main
+Description: Mama Luigi Clicker Official Repository
+MD5Sum:
+ 9e447814f1822cffbd45d634964b1a91 762 main/binary-amd64/Packages
+ 03d6cd859a92c088e39f636517871242 490 main/binary-amd64/Packages.gz
+ 4449dd2fe11b827e4ed25a34ea0358ee 141 main/binary-amd64/Release
+SHA1:
+ 9c2127348ef65ae378b1b9ae5a3c6a4a9b6b5e5b 762 main/binary-amd64/Packages
+ a5b9d10477cbd878aac1cee6def9d11d409ac10f 490 main/binary-amd64/Packages.gz
+ 5b416409e89671f0410c1c0fcc7f0c57662e8e0f 141 main/binary-amd64/Release
+SHA256:
+ 25f6fdcc4dd75b16dc5786c7b468e1d8f2e68cdacb4823b61b66be9313873b1a 762 main/binary-amd64/Packages
+ bd9f40d03842ebc456e6c1f3bfddfac53a9e42faf9519954196fc5bab7b67480 490 main/binary-amd64/Packages.gz
+ 835d7359b19a69585d2d1a9786340ee36ecdb67988bc0df7306bcc2447c3fa06 141 main/binary-amd64/Release
