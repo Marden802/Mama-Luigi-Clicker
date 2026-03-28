@@ -1,0 +1,15 @@
+{
+  "name": "mama-luigi-clicker",
+  "version": "1.0.2",
+  "description": "Mama Luigi Clicker: Shadow Realm Edition",
+  "main": "main.js",
+  "author": "Malice802",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^41.1.0"
+  }
+}
